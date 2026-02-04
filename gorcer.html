@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+    <title>Grocer Verify AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            padding-top: max(10px, env(safe-area-inset-top));
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
+            max-height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-icon {
+            font-size: 1.8em;
+        }
+
+        .header-text h1 {
+            font-size: 1em;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .header-text p {
+            font-size: 0.7em;
+            opacity: 0.9;
+            margin: 2px 0 0 0;
+            line-height: 1.2;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 6px;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: 2px solid white;
+            background: white;
+            color: #667eea;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8em;
+            transition: all 0.3s;
+            min-width: 60px;
+        }
+
+        .lang-btn.inactive {
+            background: transparent;
+            color: white;
+        }
+
+        .lang-btn:active {
+            transform: scale(0.95);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            padding: 0 12px;
+            margin-top: 14px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 10px;
+            border: none;
+            background: transparent;
+            color: #999;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.9em;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-btn span:first-child {
+            font-size: 1.2em;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .content {
+            padding: 16px 14px;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            padding: 11px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .file-upload {
+            display: none;
+        }
+
+        .file-upload-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #e9ecef;
+            border-radius: 8px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 600;
+            color: #667eea;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .file-upload-btn:hover {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .file-name {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .add-btn, .verify-btn, .settings-btn {
+            padding: 11px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-width: 70px;
+        }
+
+        .add-btn:active, .verify-btn:active, .settings-btn:active {
+            transform: translateY(1px);
+            opacity: 0.9;
+        }
+
+        .add-btn:disabled, .verify-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .settings-btn {
+            min-width: auto;
+            padding: 8px 12px;
+            font-size: 0.85em;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 14px 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-total { color: #667eea; }
+        .stat-purchased { color: #27ae60; }
+        .stat-remaining { color: #f39c12; }
+
+        .stat-label {
+            font-size: 0.65em;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        .shopping-list {
+            list-style: none;
+            margin-bottom: 12px;
+        }
+
+        .shopping-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s;
+        }
+
+        .shopping-item:active {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .shopping-item.bought {
+            background: #f5f5f5;
+            opacity: 0.7;
+        }
+
+        .shopping-item.bought .item-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .shopping-item.matched {
+            background: #f0fdf4;
+            border-color: #27ae60;
+        }
+
+        .checkbox-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #e9ecef;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            border: 2px solid #e9ecef;
+        }
+
+        .checkbox-circle:active {
+            transform: scale(0.95);
+        }
+
+        .item-text {
+            flex: 1;
+            font-size: 0.95em;
+            color: #333;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .item-badge {
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #e8f5e9;
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: #ddd;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: color 0.2s;
+            padding: 4px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .delete-btn:active {
+            transform: scale(0.9);
+            color: #e74c3c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 2.5em;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .action-btn.clear-purchased {
+            background: transparent;
+            color: #27ae60;
+            border: 2px solid #27ae60;
+        }
+
+        .action-btn.clear-purchased:active {
+            background: #f0fdf4;
+        }
+
+        .action-btn.clear-all {
+            background: transparent;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+
+        .action-btn.clear-all:active {
+            background: #fef2f2;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .verify-content {
+            padding: 20px;
+        }
+
+        .api-config-section {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 0.85em;
+            color: #065f46;
+            line-height: 1.4;
+        }
+
+        .api-form-group {
+            margin-bottom: 12px;
+        }
+
+        .api-form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .api-form-group input {
+            width: 100%;
+        }
+
+        .comparison-result {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .result-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .badge-found {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-missing {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .summary-title {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9em;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 12px 0;
+            color: #999;
+        }
+
+        .info-box {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 0.85em;
+            color: #92400e;
+            line-height: 1.4;
+        }
+
+        .groq-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 12px 14px;
+            text-align: center;
+            color: #999;
+            font-size: 0.75em;
+            border-top: 1px solid #e9ecef;
+            flex-shrink: 0;
+            line-height: 1.4;
+        }
+
+        .content-wrapper::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .content-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .content-wrapper::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 2px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 12px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.2em;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .api-key-display {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.85em;
+        }
+
+        @media (max-height: 600px) {
+            header {
+                padding: 12px 12px;
+            }
+
+            .header-text h1 {
+                font-size: 1.2em;
+            }
+
+            .header-text p {
+                font-size: 0.65em;
+            }
+
+            .tabs {
+                margin-top: 8px;
+                padding: 0 10px;
+            }
+
+            .content {
+                padding: 12px 10px;
+            }
+
+            .stats-container {
+                margin-bottom: 12px;
+                gap: 8px;
+            }
+
+            .stat-box {
+                padding: 10px 8px;
+            }
+
+            .stat-number {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <div class="header-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+                <div class="header-text">
+                    <h1 id="appTitle">Grocer Verify AI</h1>
+                    <p id="appSubtitle">Smart Shopping</p>
+                </div>
+            </div>
+            <div class="language-selector">
+                <button class="lang-btn active" onclick="changeLanguage('en')" id="engBtn">EN</button>
+                <button class="lang-btn inactive" onclick="changeLanguage('ta')" id="tamBtn">TM</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('shopping')" id="shoppingTab">
+                <span>📝</span>
+                <span id="shoppingTabLabel">List</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('verify')" id="verifyTab">
+                <span>⚡</span>
+                <span id="verifyTabLabel">Verify</span>
+            </button>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Shopping List Page -->
+            <div id="shoppingPage" class="page active">
+                <div class="content">
+                    <div class="input-section">
+                        <input type="text" id="itemInput" placeholder="e.g., Milk 1/2 l">
+                        <button class="add-btn" onclick="addItem()" id="addBtn">
+                            <span>+</span>
+                            <span id="addBtnText">Add</span>
+                        </button>
+                    </div>
+
+                    <div class="stats-container" id="statsContainer" style="display: none;">
+                        <div class="stat-box">
+                            <div class="stat-number stat-total" id="totalItems">0</div>
+                            <div class="stat-label" id="totalItemsLabel">Total</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number stat-purchased" id="purchasedCount">0</div>
+                            <div class="stat-label" id="purchasedLabel">Bought</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number stat-remaining" id="remainingCount">0</div>
+                            <div class="stat-label" id="remainingLabel">Left</div>
+                        </div>
+                    </div>
+
+                    <ul class="shopping-list" id="shoppingList"></ul>
+
+                    <div class="action-buttons" id="actionButtons" style="display: none;">
+                        <button class="action-btn clear-purchased" onclick="clearPurchased()" id="clearPurchasedBtn">
+                            <span id="clearPurchasedText">Clear</span>
+                        </button>
+                        <button class="action-btn clear-all" onclick="clearAll()" id="clearAllBtn">
+                            <span id="clearAllText">Delete All</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verify Bill Page -->
+            <div id="verifyPage" class="page">
+                <div class="verify-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 id="verifyTitle" style="margin: 0; font-size: 1.1em;">Invoice Verification<span class="groq-badge">⚡ Groq</span></h3>
+                        <button class="settings-btn" onclick="showApiSettings()" id="settingsBtn">
+                            <i class="fa-solid fa-gear"></i> <span id="settingsText">Settings</span>
+                        </button>
+                    </div>
+
+                    <div id="verifyBody">
+                        <div id="invoiceInputSection">
+                            <div class="api-config-section" id="apiStatusBox">
+                                <strong>✓ Ready to Verify</strong><br>
+                                <small>⚡ Groq API Configured (Ultra-Fast)</small>
+                            </div>
+
+                            <div class="info-box">
+                                <strong>💡 Tip:</strong> Paste your invoice details, bill text, or list of items purchased. The AI will match them with your shopping list instantly! ⚡
+                            </div>
+
+                            <label id="invoiceLabel" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Invoice Data:</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="invoiceFile" class="file-upload" accept="image/*,.pdf,.txt">
+                                <button class="file-upload-btn" id="fileUploadBtn" onclick="document.getElementById('invoiceFile').click()">
+                                    <i class="fa-solid fa-image"></i>
+                                    <span id="uploadImageText">Upload Invoice Image/PDF/Text</span>
+                                </button>
+                                <div class="file-name" id="fileName"></div>
+                            </div>
+
+                            <div class="divider">or</div>
+
+                            <textarea id="invoiceText" placeholder="Paste invoice text or details here...&#10;Example:&#10;Milk - $2.50&#10;Bread - $1.20&#10;Butter - $3.00"></textarea>
+
+                            <button class="verify-btn" onclick="verifyInvoice()" id="verifyInvoiceBtn">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span id="verifyBtnText">Verify with Groq AI</span>
+                            </button>
+                        </div>
+
+                        <div id="verifyResults" style="display: none;">
+                            <button class="action-btn" onclick="resetVerify()" style="background: transparent; color: #667eea; border: 2px solid #667eea; width: 100%; margin-bottom: 16px;" id="newVerifyBtn">
+                                <span id="newVerifyText">New Verification</span>
+                            </button>
+                            
+                            <div id="resultsContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <span id="footerText">Grocer Verify AI - Powered by Groq (Free & Fast)</span>
+        </footer>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="settingsTitle">⚡ Groq API Settings</h2>
+                <button class="close-btn" onclick="closeApiSettings()">&times;</button>
+            </div>
+            <div id="settingsContent"></div>
+        </div>
+    </div>
+
+    <!-- First Time Setup Modal -->
+    <div class="modal-overlay" id="setupModal" style="background: rgba(0,0,0,0.7);">
+        <div class="modal" style="max-width: 420px;">
+            <div style="text-align: center; padding-bottom: 20px;">
+                <h2 style="font-size: 1.5em; margin-bottom: 12px;">⚡ Welcome to Grocer Verify AI</h2>
+                <p style="color: #666; font-size: 0.95em; line-height: 1.6;">
+                    To get started, you need a FREE Groq API key (takes 1 minute)
+                </p>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; border-radius: 8px; margin-bottom: 16px; font-size: 0.9em;">
+                <strong>Step 1:</strong> Go to <a href="https://console.groq.com" target="_blank" style="color: white; text-decoration: underline; font-weight: bold;">console.groq.com</a><br>
+                <strong>Step 2:</strong> Sign up with your email<br>
+                <strong>Step 3:</strong> Copy your API key<br>
+                <strong>Step 4:</strong> Paste it here & click Save
+            </div>
+
+            <div class="api-form-group">
+                <label style="font-weight: 700; color: #333;">Your Groq API Key:</label>
+                <input type="password" id="setupApiKeyInput" placeholder="gsk_..." style="font-size: 0.9em; padding: 12px;">
+                <small style="color: #667eea; margin-top: 4px; display: block;">
+                    <i class="fa-solid fa-shield"></i> Your key is stored only in your browser
+                </small>
+            </div>
+
+            <button class="verify-btn" onclick="completeSetup()" style="width: 100%; margin-top: 16px; padding: 12px;">
+                <i class="fa-solid fa-check"></i> Save & Continue
+            </button>
+
+            <button class="verify-btn" onclick="skipSetup()" style="width: 100%; margin-top: 8px; padding: 12px; background: linear-gradient(135deg, #999 0%, #666 100%);">
+                Skip for Now
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let items = [];
+        let currentLanguage = 'en';
+        const STORAGE_KEY = 'grocerAI_items';
+        const LANG_KEY = 'grocerAI_language';
+        const GROQ_API_KEY_STORAGE = 'grocerAI_groqKey';
+        
+        // Default Groq models
+        const GROQ_MODELS = [
+            'mixtral-8x7b-32768',
+            'llama2-70b-4096',
+            'gemma-7b-it'
+        ];
+
+        const translations = {
+            en: {
+                appTitle: "Grocer Verify AI",
+                appSubtitle: "Smart Shopping",
+                shoppingTabLabel: "List",
+                verifyTabLabel: "Verify",
+                verifyTitle: "Invoice Verification",
+                settingsTitle: "Groq API Settings",
+                settingsText: "Settings",
+                itemPlaceholder: "e.g., Milk 1/2 l",
+                addBtnText: "Add",
+                totalItemsLabel: "Total",
+                purchasedLabel: "Bought",
+                remainingLabel: "Left",
+                clearPurchasedText: "Clear",
+                clearAllText: "Delete All",
+                noItems: "No items yet.\nAdd items to get started!",
+                enterItem: "Please enter an item",
+                confirmClear: "Remove purchased items?",
+                confirmClearAll: "Delete all items?",
+                invoiceLabel: "Invoice Data:",
+                uploadImageText: "Upload Invoice Image/PDF/Text",
+                verifyBtnText: "Verify with Groq AI",
+                newVerifyText: "New Verification",
+                verifyingText: "Verifying invoice with Groq AI (⚡ Ultra-fast)...",
+                errorNoInvoice: "Please provide invoice data (text or image)",
+                errorNoApiKey: "Please enter your Groq API key",
+                errorVerification: "Verification failed. Check your API key or try again.",
+                footerText: "Grocer Verify AI - Powered by Groq (Free & Fast)",
+                apiKeyLabel: "Groq API Key:",
+                apiKeyPlaceholder: "gsk_...",
+                apiKeyHint: "Get free API key from console.groq.com (completely FREE)",
+                saveSettings: "Save Settings",
+                testConnection: "Test Connection",
+                connectionSuccess: "✓ Connection successful!",
+                connectionFailed: "✗ Connection failed. Check your API key."
+            },
+            ta: {
+                appTitle: "Grocer Verify AI",
+                appSubtitle: "ஸ்மார்ட் வாங்குதல்",
+                shoppingTabLabel: "பட்டியல்",
+                verifyTabLabel: "சரிபார்க்கவும்",
+                verifyTitle: "பரிவர்த்தனை சரிபார்ப்பு",
+                settingsTitle: "⚡ Groq API அமைப்புகள்",
+                settingsText: "அமைப்புகள்",
+                itemPlaceholder: "எ.கா., பால் 1/2 லி",
+                addBtnText: "சேர்",
+                totalItemsLabel: "மொத்தம்",
+                purchasedLabel: "வாங்கியவை",
+                remainingLabel: "மீதி",
+                clearPurchasedText: "அழிக்கவும்",
+                clearAllText: "முழு அழிக்கவும்",
+                noItems: "பொருட்கள் இல்லை.\nதொடங்க சேர்க்கவும்!",
+                enterItem: "பொருளைச் சேர்க்கவும்",
+                confirmClear: "வாங்கியவற்றை அழிக்கவா?",
+                confirmClearAll: "அனைத்தையும் அழிக்கவா?",
+                invoiceLabel: "பரிவர்த்தனை உரை:",
+                uploadImageText: "பரிவர்த்தனை படம்/PDF/உரை பதிவேற்றவும்",
+                verifyBtnText: "Groq AI உடன் சரிபார்க்கவும்",
+                newVerifyText: "புதிய சரிபார்ப்பு",
+                verifyingText: "Groq AI உடன் பரிவர்த்தனை சரிபார்க்கப்படுகிறது (⚡ பளிச்சென்று வேகமாக)...",
+                errorNoInvoice: "பரிவர்த்தனை தரவு வழங்கவும் (உரை அல்லது படம்)",
+                errorNoApiKey: "உங்கள் Groq API முறைக்குறிப்பை உள்ளிடவும்",
+                errorVerification: "சரிபார்ப்பு தோல்வியடைந்தது. உங்கள் API முறைக்குறிப்பைச் சரிபார்க்கவும் அல்லது மீண்டும் முயற்சிக்கவும்.",
+                footerText: "Grocer Verify AI - Groq மூலம் இயக்கப்படுகிறது (இலவசம் & வேகமாக)",
+                apiKeyLabel: "Groq API முறைக்குறிப்பு:",
+                apiKeyPlaceholder: "gsk_...",
+                apiKeyHint: "console.groq.com இலிருந்து இலவச API முறைக்குறிப்பு பெறுங்கள் (முற்றிலும் இலவசம்)",
+                saveSettings: "அமைப்புகளை சேமிக்கவும்",
+                testConnection: "இணைப்பை சோதிக்கவும்",
+                connectionSuccess: "✓ இணைப்பு வெற்றிகரமாக உள்ளது!",
+                connectionFailed: "✗ இணைப்பு தோல்வியடைந்தது. உங்கள் API முறைக்குறிப்பைச் சரிபார்க்கவும்."
+            }
+        };
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) items = JSON.parse(saved);
+                const savedLang = localStorage.getItem(LANG_KEY);
+                if (savedLang) currentLanguage = savedLang;
+                
+                // Set default API key if not already saved
+                const savedApiKey = localStorage.getItem(GROQ_API_KEY_STORAGE);
+                if (!savedApiKey) {
+                    saveGroqApiKey('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');
+                }
+            } catch (e) {
+                console.log('Error loading data:', e);
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+                localStorage.setItem(LANG_KEY, currentLanguage);
+            } catch (e) {
+                console.log('Error saving data:', e);
+            }
+        }
+
+        function getGroqApiKey() {
+            return localStorage.getItem(GROQ_API_KEY_STORAGE) || '';
+        }
+
+        function saveGroqApiKey(key) {
+            localStorage.setItem(GROQ_API_KEY_STORAGE, key);
+        }
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            document.getElementById('engBtn').classList.toggle('active', lang === 'en');
+            document.getElementById('engBtn').classList.toggle('inactive', lang !== 'en');
+            document.getElementById('tamBtn').classList.toggle('active', lang === 'ta');
+            document.getElementById('tamBtn').classList.toggle('inactive', lang !== 'ta');
+            updatePageText();
+            renderItems();
+            saveData();
+        }
+
+        function updatePageText() {
+            const t = translations[currentLanguage];
+            document.getElementById('appTitle').textContent = t.appTitle;
+            document.getElementById('appSubtitle').textContent = t.appSubtitle;
+            document.getElementById('shoppingTabLabel').textContent = t.shoppingTabLabel;
+            document.getElementById('verifyTabLabel').textContent = t.verifyTabLabel;
+            document.getElementById('itemInput').placeholder = t.itemPlaceholder;
+            document.getElementById('addBtnText').textContent = t.addBtnText;
+            document.getElementById('totalItemsLabel').textContent = t.totalItemsLabel;
+            document.getElementById('purchasedLabel').textContent = t.purchasedLabel;
+            document.getElementById('remainingLabel').textContent = t.remainingLabel;
+            document.getElementById('clearPurchasedText').textContent = t.clearPurchasedText;
+            document.getElementById('clearAllText').textContent = t.clearAllText;
+            document.getElementById('invoiceLabel').textContent = t.invoiceLabel;
+            document.getElementById('uploadImageText').textContent = t.uploadImageText;
+            document.getElementById('verifyBtnText').textContent = t.verifyBtnText;
+            document.getElementById('newVerifyText').textContent = t.newVerifyText;
+            document.getElementById('footerText').textContent = t.footerText;
+            document.getElementById('verifyTitle').textContent = t.verifyTitle;
+            document.getElementById('settingsText').textContent = t.settingsText;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            if (tab === 'shopping') {
+                document.getElementById('shoppingPage').classList.add('active');
+                document.getElementById('shoppingTab').classList.add('active');
+                setTimeout(() => document.getElementById('itemInput').focus(), 100);
+            } else {
+                document.getElementById('verifyPage').classList.add('active');
+                document.getElementById('verifyTab').classList.add('active');
+            }
+        }
+
+        function addItem() {
+            const input = document.getElementById('itemInput');
+            const text = input.value.trim();
+
+            if (!text) {
+                alert(translations[currentLanguage].enterItem);
+                return;
+            }
+
+            items.push({
+                id: Date.now(),
+                text: text,
+                purchased: false,
+                matched: false
+            });
+
+            input.value = '';
+            input.focus();
+            renderItems();
+            saveData();
+        }
+
+        function toggleItem(id) {
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.purchased = !item.purchased;
+                renderItems();
+                saveData();
+            }
+        }
+
+        function deleteItem(id) {
+            items = items.filter(item => item.id !== id);
+            renderItems();
+            saveData();
+        }
+
+        function renderItems() {
+            const listDiv = document.getElementById('shoppingList');
+            const statsDiv = document.getElementById('statsContainer');
+            const actionsDiv = document.getElementById('actionButtons');
+
+            if (items.length === 0) {
+                listDiv.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📭</div><p>${translations[currentLanguage].noItems}</p></div>`;
+                statsDiv.style.display = 'none';
+                actionsDiv.style.display = 'none';
+                return;
+            }
+
+            statsDiv.style.display = 'grid';
+            actionsDiv.style.display = 'flex';
+
+            listDiv.innerHTML = items.map(item => `
+                <li class="shopping-item ${item.purchased ? 'bought' : ''} ${item.matched ? 'matched' : ''}">
+                    <div class="checkbox-circle" onclick="toggleItem(${item.id})" style="background: ${item.purchased ? '#27ae60' : '#e9ecef'}; color: ${item.purchased ? 'white' : '#667eea'}; border-color: ${item.purchased ? '#27ae60' : '#e9ecef'};">
+                        ${item.purchased ? '✓' : ''}
+                    </div>
+                    <div style="flex: 1;">
+                        <div class="item-text">${item.text}</div>
+                        ${item.matched ? '<div class="item-badge" style="margin-top: 4px;">✓ Found in Invoice</div>' : ''}
+                    </div>
+                    <button class="delete-btn" onclick="deleteItem(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
+                </li>
+            `).join('');
+
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const total = items.length;
+            const purchased = items.filter(i => i.purchased).length;
+            const remaining = total - purchased;
+
+            document.getElementById('totalItems').textContent = total;
+            document.getElementById('purchasedCount').textContent = purchased;
+            document.getElementById('remainingCount').textContent = remaining;
+        }
+
+        function clearPurchased() {
+            const purchasedCount = items.filter(i => i.purchased).length;
+            
+            if (purchasedCount === 0) {
+                alert(translations[currentLanguage].noItems);
+                return;
+            }
+
+            if (confirm(translations[currentLanguage].confirmClear)) {
+                items = items.filter(i => !i.purchased);
+                renderItems();
+                saveData();
+            }
+        }
+
+        function clearAll() {
+            if (items.length === 0) {
+                alert(translations[currentLanguage].noItems);
+                return;
+            }
+
+            if (confirm(translations[currentLanguage].confirmClearAll)) {
+                items = [];
+                renderItems();
+                saveData();
+            }
+        }
+
+        function showApiSettings() {
+            const modal = document.getElementById('settingsModal');
+            const apiKey = getGroqApiKey();
+            const t = translations[currentLanguage];
+
+            const maskedKey = apiKey ? 
+                apiKey.substring(0, 7) + '...' + apiKey.substring(apiKey.length - 4) : 
+                '';
+
+            let settingsHTML = `
+                <div class="api-form-group">
+                    <label>${t.apiKeyLabel}</label>
+                    <input type="password" id="apiKeyInput" value="${apiKey}" placeholder="${t.apiKeyPlaceholder}">
+                    <div class="api-key-display">
+                        <strong>Get Free API Key:</strong><br>
+                        <a href="https://console.groq.com" target="_blank" style="color: #667eea; text-decoration: underline;">→ Go to console.groq.com</a>
+                    </div>
+                    ${apiKey ? `<small style="color: #10b981; margin-top: 4px; display: block;">✓ Currently: ${maskedKey}</small>` : ''}
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 16px;">
+                    <button class="verify-btn" onclick="saveGroqSettings()" style="flex: 1;">
+                        ${t.saveSettings}
+                    </button>
+                    <button class="verify-btn" onclick="testGroqConnection()" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        ${t.testConnection}
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('settingsContent').innerHTML = settingsHTML;
+            modal.classList.add('show');
+        }
+
+        function saveGroqSettings() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            
+            if (!apiKey) {
+                alert('Please enter your Groq API key');
+                return;
+            }
+
+            saveGroqApiKey(apiKey);
+            closeApiSettings();
+            alert(translations[currentLanguage].connectionSuccess);
+        }
+
+        async function testGroqConnection() {
+            const t = translations[currentLanguage];
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+
+            if (!apiKey) {
+                alert(translations[currentLanguage].errorNoApiKey);
+                return;
+            }
+
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'mixtral-8x7b-32768',
+                        messages: [{ role: 'user', content: 'Say OK' }],
+                        max_tokens: 10
+                    })
+                });
+
+                if (response.ok) {
+                    alert(t.connectionSuccess);
+                } else {
+                    alert(t.connectionFailed);
+                }
+            } catch (error) {
+                alert(t.connectionFailed);
+            }
+        }
+
+        function closeApiSettings() {
+            document.getElementById('settingsModal').classList.remove('show');
+        }
+
+        document.getElementById('invoiceFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = `File: ${file.name}`;
+            }
+        });
+
+        async function verifyInvoice() {
+            const apiKey = getGroqApiKey();
+            const invoiceText = document.getElementById('invoiceText').value.trim();
+            const invoiceFile = document.getElementById('invoiceFile').files[0];
+            const t = translations[currentLanguage];
+
+            if (!apiKey) {
+                showError(t.errorNoApiKey + '\n\n→ Click Settings to add your free Groq API key');
+                return;
+            }
+
+            if (!invoiceText && !invoiceFile) {
+                showError(t.errorNoInvoice);
+                return;
+            }
+
+            if (items.length === 0) {
+                showError(t.noItems);
+                return;
+            }
+
+            showVerifying();
+
+            try {
+                let invoiceContent = invoiceText;
+
+                if (invoiceFile) {
+                    invoiceContent = await readFile(invoiceFile);
+                }
+
+                const shoppingListText = items.map(item => `- ${item.text}`).join('\n');
+
+                const prompt = `You are a smart invoice verification assistant. I have a shopping list and an invoice. Compare them and tell me:
+
+1. Which items from my shopping list were found in the invoice
+2. Which items are missing from the invoice
+3. Any extra items in the invoice not on my list
+
+Shopping List:
+${shoppingListText}
+
+Invoice:
+${invoiceContent}
+
+Provide a structured response with three sections: FOUND, MISSING, and EXTRA. Format each item clearly.`;
+
+                const result = await callGroqAPI(apiKey, prompt);
+
+                // Parse results and mark matched items
+                const foundItems = extractFound(result);
+                foundItems.forEach(foundText => {
+                    const matchedItem = items.find(item => 
+                        item.text.toLowerCase().includes(foundText.toLowerCase()) ||
+                        foundText.toLowerCase().includes(item.text.toLowerCase())
+                    );
+                    if (matchedItem) {
+                        matchedItem.matched = true;
+                    }
+                });
+
+                displayVerifyResults(result);
+                saveData();
+                renderItems();
+            } catch (error) {
+                showError(t.errorVerification + '\n\n' + error.message);
+            }
+        }
+
+        async function callGroqAPI(apiKey, prompt) {
+            console.log('Calling Groq API with key:', apiKey.substring(0, 10) + '...');
+            
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'mixtral-8x7b-32768',
+                        messages: [{ role: 'user', content: prompt }],
+                        temperature: 0.7,
+                        max_tokens: 1024
+                    })
+                });
+
+                console.log('Groq Response Status:', response.status);
+
+                if (!response.ok) {
+                    let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error?.message || errorMessage;
+                    } catch (e) {
+                        // If error response is not JSON, use status text
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                console.log('Groq Response:', data);
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('Groq API Error:', error);
+                
+                // Check for specific errors
+                if (error.message.includes('401')) {
+                    throw new Error('Invalid API Key. Check your Groq API key at console.groq.com');
+                } else if (error.message.includes('429')) {
+                    throw new Error('Rate limit reached. Try again in a few seconds.');
+                } else if (error.message.includes('Failed to fetch')) {
+                    throw new Error('Network error. Check your internet connection.');
+                }
+                
+                throw error;
+            }
+        }
+
+        function extractFound(resultText) {
+            const foundSection = resultText.match(/FOUND:?([\s\S]*?)(?:MISSING:|EXTRA:|$)/i);
+            if (!foundSection) return [];
+            
+            return foundSection[1]
+                .split('\n')
+                .filter(line => line.trim())
+                .map(line => line.replace(/^[-*]\s*/, '').trim())
+                .filter(line => line.length > 0);
+        }
+
+        function readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        function showVerifying() {
+            const t = translations[currentLanguage];
+            document.getElementById('invoiceInputSection').style.display = 'none';
+            document.getElementById('verifyResults').style.display = 'block';
+            document.getElementById('resultsContainer').innerHTML = `
+                <div class="processing">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 12px; color: #999;">${t.verifyingText}</p>
+                </div>
+            `;
+        }
+
+        function displayVerifyResults(result) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            const found = result.match(/FOUND:?([\s\S]*?)(?:MISSING:|EXTRA:|$)/i);
+            const missing = result.match(/MISSING:?([\s\S]*?)(?:EXTRA:|FOUND:|$)/i);
+            const extra = result.match(/EXTRA:?([\s\S]*?)(?:FOUND:|MISSING:|$)/i);
+
+            let html = '';
+
+            const foundCount = found ? found[1].trim().split('\n').filter(l => l.trim()).length : 0;
+            const missingCount = missing ? missing[1].trim().split('\n').filter(l => l.trim()).length : 0;
+
+            html += `
+                <div class="summary-box">
+                    <div class="summary-title">Match Rate</div>
+                    <div class="summary-value">${foundCount}/${items.length}</div>
+                </div>
+            `;
+
+            if (found) {
+                html += `
+                    <div class="comparison-result">
+                        <strong style="color: #27ae60;">✓ Found in Invoice (${foundCount})</strong>
+                        ${found[1].trim().split('\n').filter(l => l.trim()).map(line => `
+                            <div class="result-item">
+                                <span class="result-item-name">${line.replace(/^[-*]\s*/, '')}</span>
+                                <span class="result-badge badge-found">FOUND</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            if (missing) {
+                const missingLines = missing[1].trim().split('\n').filter(l => l.trim());
+                if (missingLines.length > 0) {
+                    html += `
+                        <div class="comparison-result">
+                            <strong style="color: #f39c12;">⚠ Missing from Invoice (${missingLines.length})</strong>
+                            ${missingLines.map(line => `
+                                <div class="result-item">
+                                    <span class="result-item-name">${line.replace(/^[-*]\s*/, '')}</span>
+                                    <span class="result-badge badge-missing">MISSING</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            }
+
+            if (extra) {
+                const extraLines = extra[1].trim().split('\n').filter(l => l.trim());
+                if (extraLines.length > 0) {
+                    html += `
+                        <div class="comparison-result">
+                            <strong style="color: #667eea;">📦 Extra Items in Invoice (${extraLines.length})</strong>
+                            ${extraLines.map(line => `
+                                <div class="result-item">
+                                    <span class="result-item-name">${line.replace(/^[-*]\s*/, '')}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            }
+
+            resultsContainer.innerHTML = html;
+        }
+
+        function showError(message) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = `<div class="error-message">${message}</div>`;
+            document.getElementById('invoiceInputSection').style.display = 'none';
+            document.getElementById('verifyResults').style.display = 'block';
+        }
+
+        function resetVerify() {
+            document.getElementById('invoiceInputSection').style.display = 'block';
+            document.getElementById('verifyResults').style.display = 'none';
+            document.getElementById('invoiceText').value = '';
+            document.getElementById('invoiceFile').value = '';
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('resultsContainer').innerHTML = '';
+        }
+
+        // Initialize
+        loadData();
+        updatePageText();
+        renderItems();
+        document.getElementById('itemInput').focus();
+
+        // Show setup modal only if no API key exists
+        setTimeout(() => {
+            const apiKey = getGroqApiKey();
+            if (!apiKey || apiKey === '') {
+                document.getElementById('setupModal').classList.add('show');
+            }
+        }, 300);
+
+        function completeSetup() {
+            const apiKey = document.getElementById('setupApiKeyInput').value.trim();
+            
+            if (!apiKey) {
+                alert('Please enter your Groq API key');
+                return;
+            }
+
+            if (!apiKey.startsWith('gsk_')) {
+                alert('Invalid API key format. Groq keys start with "gsk_"');
+                return;
+            }
+
+            saveGroqApiKey(apiKey);
+            document.getElementById('setupModal').classList.remove('show');
+            alert('✓ API key saved! You\'re ready to verify invoices.');
+        }
+
+        function skipSetup() {
+            document.getElementById('setupModal').classList.remove('show');
+        }
+
+        document.getElementById('itemInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addItem();
+        });
+
+        window.addEventListener('beforeunload', saveData);
+
+        // Close modal on outside click
+        document.getElementById('settingsModal').addEventListener('click', function(e) {
+            if (e.target === this) closeApiSettings();
+        });
+    </script>
+</body>
+</html>
