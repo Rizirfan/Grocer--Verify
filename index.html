@@ -895,7 +895,7 @@
         
         // Default Groq models
         const GROQ_MODELS = [
-            'mixtral-8x7b-32768',
+            'llama3-8b-8192',
             'llama2-70b-4096',
             'gemma-7b-it'
         ];
@@ -1226,7 +1226,7 @@
                         'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: 'mixtral-8x7b-32768',
+                        model: 'llama3-8b-8192',
                         messages: [{ role: 'user', content: 'Say OK' }],
                         max_tokens: 10
                     })
@@ -1332,7 +1332,7 @@ Provide a structured response with three sections: FOUND, MISSING, and EXTRA. Fo
                         'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: 'mixtral-8x7b-32768',
+                        model: 'llama3-8b-8192',
                         messages: [{ role: 'user', content: prompt }],
                         temperature: 0.7,
                         max_tokens: 1024
@@ -1537,3 +1537,4 @@ Provide a structured response with three sections: FOUND, MISSING, and EXTRA. Fo
     </script>
 </body>
 </html>
+
